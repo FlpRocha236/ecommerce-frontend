@@ -1,14 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart';
 import { OrderService } from '../../services/order';
@@ -17,112 +10,119 @@ import { Cart } from '../../models/product.model';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule, MatCardModule, MatButtonModule,
-    MatIconModule, MatInputModule, MatFormFieldModule,
-    MatSnackBarModule, MatDividerModule, MatListModule, RouterLink
-  ],
+  imports: [CommonModule, FormsModule, MatSnackBarModule, RouterLink],
   template: `
-    <div class="page-header">
-      <h1>🛒 Carrinho</h1>
-    </div>
+    <section class="hero">
+      <p class="hero-eyebrow">Carrinho</p>
+      <h1 class="hero-title">Seu carrinho.</h1>
+    </section>
 
-    <!-- Email do cliente -->
-    <mat-card class="email-card">
-      <mat-card-content>
-        <mat-form-field appearance="outline">
-          <mat-label>Seu e-mail</mat-label>
-          <input matInput [(ngModel)]="customerEmail" placeholder="seu@email.com">
-          <mat-icon matSuffix>email</mat-icon>
-        </mat-form-field>
-        <button mat-raised-button color="primary" (click)="loadCart()">
-          <mat-icon>search</mat-icon> Buscar Carrinho
-        </button>
-      </mat-card-content>
-    </mat-card>
+    <section class="email-section">
+      <div class="email-card">
+        <div class="field">
+          <label>Seu e-mail</label>
+          <div class="input-row">
+            <input [(ngModel)]="customerEmail" placeholder="seu@email.com" />
+            <button class="btn-primary" (click)="loadCart()">Buscar</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Carrinho vazio -->
-    <mat-card *ngIf="cart && cart.items.length === 0" class="empty-card">
-      <mat-card-content>
-        <mat-icon class="empty-icon">remove_shopping_cart</mat-icon>
-        <p>Seu carrinho está vazio!</p>
-        <a mat-raised-button color="primary" routerLink="/products">
-          Ver Produtos
-        </a>
-      </mat-card-content>
-    </mat-card>
+    <section class="empty-section" *ngIf="cart && cart.items.length === 0">
+      <div class="empty-card">
+        <p class="empty-icon">🛒</p>
+        <h2>Seu carrinho está vazio.</h2>
+        <p>Adicione produtos para continuar.</p>
+        <a class="btn-primary" routerLink="/products">Ver Produtos</a>
+      </div>
+    </section>
 
-    <!-- Itens do carrinho -->
-    <div *ngIf="cart && cart.items.length > 0">
-      <mat-card *ngFor="let item of cart.items" class="item-card">
-        <mat-card-content>
-          <div class="item-row">
+    <section class="cart-section" *ngIf="cart && cart.items.length > 0">
+      <div class="cart-inner">
+        <div class="items-list">
+          <h2 class="section-title">{{ cart.totalItems }} {{ cart.totalItems === 1 ? 'item' : 'itens' }}</h2>
+          <div class="cart-item" *ngFor="let item of cart.items">
+            <div class="item-icon">{{ getEmoji(item.productName) }}</div>
             <div class="item-info">
               <h3>{{ item.productName }}</h3>
-              <p>Unitário: R$ {{ item.unitPrice | number:'1.2-2' }}</p>
               <p>Quantidade: {{ item.quantity }}</p>
+              <p>R$ {{ item.unitPrice | number:'1.2-2' }} por unidade</p>
             </div>
-            <div class="item-actions">
-              <p class="subtotal">R$ {{ item.subtotal | number:'1.2-2' }}</p>
-              <button mat-icon-button color="warn" (click)="removeItem(item.productId)">
-                <mat-icon>delete</mat-icon>
-              </button>
+            <div class="item-right">
+              <p class="item-price">R$ {{ item.subtotal | number:'1.2-2' }}</p>
+              <button class="remove-btn" (click)="removeItem(item.productId)">Remover</button>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
 
-      <!-- Total e finalizar -->
-      <mat-card class="total-card">
-        <mat-card-content>
-          <div class="total-row">
-            <h2>Total: R$ {{ cart.totalAmount | number:'1.2-2' }}</h2>
-            <p>{{ cart.totalItems }} {{ cart.totalItems === 1 ? 'item' : 'itens' }}</p>
+        <div class="summary-card">
+          <h2>Resumo</h2>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>R$ {{ cart.totalAmount | number:'1.2-2' }}</span>
           </div>
-          <mat-divider></mat-divider>
-
-          <div class="checkout-form">
-            <mat-form-field appearance="outline">
-              <mat-label>Endereço de entrega</mat-label>
-              <input matInput [(ngModel)]="shippingAddress" placeholder="Rua, número, cidade">
-              <mat-icon matSuffix>location_on</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Observações</mat-label>
-              <input matInput [(ngModel)]="notes" placeholder="Opcional">
-            </mat-form-field>
+          <div class="summary-row">
+            <span>Frete</span>
+            <span class="free">Grátis</span>
           </div>
-
-          <div class="cart-actions">
-            <button mat-raised-button color="primary" (click)="checkout()">
-              <mat-icon>check_circle</mat-icon> Finalizar Pedido
-            </button>
-            <button mat-button color="warn" (click)="clearCart()">
-              <mat-icon>delete_sweep</mat-icon> Limpar Carrinho
-            </button>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>R$ {{ cart.totalAmount | number:'1.2-2' }}</span>
           </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
+          <div class="field" style="margin-top: 20px;">
+            <label>Endereço de entrega</label>
+            <input [(ngModel)]="shippingAddress" placeholder="Rua, número, cidade" />
+          </div>
+          <div class="field">
+            <label>Observações</label>
+            <input [(ngModel)]="notes" placeholder="Opcional" />
+          </div>
+          <button class="btn-buy" (click)="checkout()">Finalizar Pedido</button>
+          <button class="btn-ghost" (click)="clearCart()">Limpar Carrinho</button>
+        </div>
+      </div>
+    </section>
   `,
   styles: [`
-    .page-header { margin-bottom: 24px; }
-    .email-card { margin-bottom: 16px; }
-    mat-form-field { width: 100%; margin-bottom: 8px; }
-    .empty-card { text-align: center; padding: 48px; }
-    .empty-icon { font-size: 64px; width: 64px; height: 64px; color: #ccc; }
-    .item-card { margin-bottom: 12px; }
-    .item-row { display: flex; justify-content: space-between; align-items: center; }
-    .item-info h3 { margin: 0 0 4px; }
-    .item-info p { margin: 0; color: #666; }
-    .item-actions { text-align: right; }
-    .subtotal { font-size: 1.2rem; font-weight: bold; color: #3f51b5; margin: 0; }
-    .total-card { margin-top: 16px; }
-    .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .total-row h2 { margin: 0; color: #3f51b5; }
-    .checkout-form { margin-top: 16px; }
-    .cart-actions { display: flex; gap: 12px; margin-top: 16px; }
+    .hero { text-align: center; padding: 80px 24px 48px; background: #f5f5f7; }
+    .hero-eyebrow { font-size: 0.9rem; color: #6e6e73; margin-bottom: 12px; }
+    .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; color: #1d1d1f; }
+    .email-section { max-width: 800px; margin: 0 auto 32px; padding: 0 24px; }
+    .email-card { background: white; border-radius: 20px; padding: 24px 32px; }
+    .input-row { display: flex; gap: 12px; }
+    .input-row input { flex: 1; }
+    .empty-section { max-width: 600px; margin: 0 auto; padding: 48px 24px; text-align: center; }
+    .empty-card { background: white; border-radius: 20px; padding: 64px 32px; }
+    .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-card h2 { font-size: 1.5rem; margin-bottom: 8px; color: #1d1d1f; }
+    .empty-card p { color: #6e6e73; margin-bottom: 24px; }
+    .cart-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 64px; }
+    .cart-inner { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+    .section-title { font-size: 1.1rem; color: #6e6e73; font-weight: 400; margin-bottom: 16px; }
+    .cart-item { background: white; border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center; margin-bottom: 12px; }
+    .item-icon { font-size: 48px; }
+    .item-info { flex: 1; }
+    .item-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+    .item-info p { font-size: 0.85rem; color: #6e6e73; }
+    .item-right { text-align: right; }
+    .item-price { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .remove-btn { background: none; border: none; color: #0071e3; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+    .summary-card { background: white; border-radius: 20px; padding: 28px; position: sticky; top: 80px; }
+    .summary-card h2 { font-size: 1.2rem; margin-bottom: 20px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 12px; color: #1d1d1f; }
+    .free { color: #34c759; }
+    .summary-divider { border-top: 1px solid #d2d2d7; margin: 16px 0; }
+    .summary-row.total { font-weight: 600; font-size: 1rem; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 0.8rem; color: #6e6e73; font-weight: 500; }
+    .field input { padding: 10px 14px; border: 1px solid #d2d2d7; border-radius: 10px; font-size: 0.9rem; outline: none; font-family: inherit; }
+    .field input:focus { border-color: #0071e3; }
+    .btn-buy { width: 100%; padding: 14px; background: #0071e3; color: white; border: none; border-radius: 980px; font-size: 0.95rem; font-weight: 500; cursor: pointer; font-family: inherit; margin-top: 8px; transition: background 0.2s; }
+    .btn-buy:hover { background: #0077ed; }
+    .btn-ghost { width: 100%; padding: 12px; background: none; color: #0071e3; border: none; border-radius: 980px; font-size: 0.9rem; cursor: pointer; font-family: inherit; margin-top: 4px; }
+    .btn-primary { padding: 10px 20px; background: #0071e3; color: white; border: none; border-radius: 980px; font-size: 0.9rem; font-weight: 500; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
   `]
 })
 export class CartComponent implements OnInit {
@@ -134,43 +134,53 @@ export class CartComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() { this.loadCart(); }
 
   loadCart() {
     this.cartService.getCart(this.customerEmail).subscribe({
-      next: (cart) => this.cart = cart,
-      error: () => this.cart = { id: 0, customerEmail: this.customerEmail, items: [], totalAmount: 0, totalItems: 0 }
+      next: (cart) => { this.cart = cart; this.cdr.detectChanges(); },
+      error: () => {
+        this.cart = { id: 0, customerEmail: this.customerEmail, items: [], totalAmount: 0, totalItems: 0 };
+        this.cdr.detectChanges();
+      }
     });
   }
 
   removeItem(productId: number) {
     this.cartService.removeItem(this.customerEmail, productId).subscribe({
-      next: (cart) => { this.cart = cart; this.snackBar.open('Item removido!', 'OK', { duration: 3000 }); },
-      error: () => this.snackBar.open('Erro ao remover item', 'OK', { duration: 3000 })
+      next: (cart) => { this.cart = cart; this.cdr.detectChanges(); this.snackBar.open('Item removido!', 'OK', { duration: 3000 }); },
+      error: () => this.snackBar.open('Erro ao remover', 'OK', { duration: 3000 })
     });
   }
 
   clearCart() {
     this.cartService.clearCart(this.customerEmail).subscribe({
       next: () => { this.loadCart(); this.snackBar.open('Carrinho limpo!', 'OK', { duration: 3000 }); },
-      error: () => this.snackBar.open('Erro ao limpar carrinho', 'OK', { duration: 3000 })
+      error: () => this.snackBar.open('Erro ao limpar', 'OK', { duration: 3000 })
     });
   }
 
   checkout() {
-    if (!this.shippingAddress) {
-      this.snackBar.open('Informe o endereço de entrega!', 'OK', { duration: 3000 });
-      return;
-    }
+    if (!this.shippingAddress) { this.snackBar.open('Informe o endereço!', 'OK', { duration: 3000 }); return; }
     this.orderService.create(this.customerEmail, this.shippingAddress, this.notes).subscribe({
-      next: (order) => {
-        this.snackBar.open(`Pedido #${order.id} criado com sucesso!`, 'OK', { duration: 4000 });
-        this.loadCart();
-      },
+      next: (order) => { this.snackBar.open(`Pedido #${order.id} criado!`, 'OK', { duration: 4000 }); this.loadCart(); },
       error: () => this.snackBar.open('Erro ao criar pedido', 'OK', { duration: 3000 })
     });
+  }
+
+  getEmoji(name: string): string {
+    const n = name.toLowerCase();
+    if (n.includes('notebook') || n.includes('mac') || n.includes('laptop')) return '💻';
+    if (n.includes('iphone') || n.includes('celular')) return '📱';
+    if (n.includes('teclado')) return '⌨️';
+    if (n.includes('mouse')) return '🖱️';
+    if (n.includes('fone') || n.includes('airpod')) return '🎧';
+    if (n.includes('tv') || n.includes('monitor')) return '🖥️';
+    if (n.includes('watch')) return '⌚';
+    return '📦';
   }
 }
