@@ -4,7 +4,7 @@
 ![Angular Material](https://img.shields.io/badge/Angular_Material-21-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 
-Frontend do projeto E-commerce API desenvolvido em Angular com design inspirado na Apple Store.
+Frontend do projeto E-commerce API desenvolvido em Angular com design inspirado naquela marca famosa da maça.
 
 ## 🚀 Tecnologias
 
