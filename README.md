@@ -1,59 +1,103 @@
-# EcommerceFrontend
+# 🛍️ E-commerce Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
+![Angular](https://img.shields.io/badge/Angular-21-red)
+![Angular Material](https://img.shields.io/badge/Angular_Material-21-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 
-## Development server
+Frontend do projeto E-commerce API desenvolvido em Angular com design inspirado na Apple Store.
 
-To start a local development server, run:
+## 🚀 Tecnologias
+
+- Angular 21
+- TypeScript 5
+- Angular Material
+- RxJS
+- CSS puro com design system customizado
+
+## 📦 Funcionalidades
+
+- ✅ Listagem de produtos com cards visuais
+- ✅ Criação e edição de produtos
+- ✅ Adição de produtos ao carrinho
+- ✅ Gestão do carrinho com remoção de itens
+- ✅ Finalização de pedido com endereço e observações
+- ✅ Listagem de pedidos por cliente
+- ✅ Pagamento e cancelamento de pedidos
+- ✅ Design responsivo inspirado na Apple Store
+- ✅ Feedback visual com snackbars
+
+## ⚙️ Como executar localmente
+
+### Pré-requisitos
+
+- Node.js 20+
+- Angular CLI 21+
+- [ecommerce-api](https://github.com/FlpRocha236/ecommerce-api) rodando na porta 8080
+
+### Passo a passo
 
 ```bash
+# Clone o repositório
+git clone https://github.com/FlpRocha236/ecommerce-frontend.git
+cd ecommerce-frontend
+
+# Instale as dependências
+npm install
+
+# Execute o projeto
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Acesse em:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 📁 Estrutura do projeto
 
-```bash
-ng generate --help
+```
+src/app/
+├── components/
+│   └── navbar/        ← Barra de navegação
+├── pages/
+│   ├── products/      ← Página da loja
+│   ├── cart/          ← Página do carrinho
+│   └── orders/        ← Página de pedidos
+├── services/
+│   ├── product.ts     ← Integração com API de produtos
+│   ├── cart.ts        ← Integração com API do carrinho
+│   └── order.ts       ← Integração com API de pedidos
+└── models/
+    └── product.model.ts  ← Interfaces TypeScript
 ```
 
-## Building
+## 🔗 Projetos relacionados
 
-To build the project run:
+- [ecommerce-api](https://github.com/FlpRocha236/ecommerce-api) — Backend Spring Boot
 
-```bash
-ng build
-```
+## 🖼️ Páginas
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Loja
 
-## Running unit tests
+- Grid de produtos com emojis dinâmicos por categoria
+- Botão de adicionar ao carrinho
+- Formulário de criação e edição inline
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Carrinho
 
-```bash
-ng test
-```
+- Lista de itens com subtotais
+- Resumo com frete grátis
+- Formulário de endereço e observações
+- Finalização de pedido integrada
 
-## Running end-to-end tests
+### Pedidos
 
-For end-to-end (e2e) testing, run:
+- Lista de pedidos em acordeão
+- Badges de status e pagamento coloridos
+- Ações de pagamento e cancelamento
 
-```bash
-ng e2e
-```
+## 👨‍💻 Autor
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+**Felipe Rocha**
+[GitHub](https://github.com/FlpRocha236)
